@@ -1,0 +1,64 @@
+{
+  "benchmark": "30 simulated incidents: 6 fault types x 5 seeds",
+  "metric": "diagnosis correct = root-cause service AND fault type match the injected fault",
+  "n": 30,
+  "agent": {
+    "accuracy": 0.9667,
+    "service_accuracy": 0.9667
+  },
+  "baseline_alert_only": {
+    "accuracy": 0.0333,
+    "service_accuracy": 0.0667
+  },
+  "by_fault": {
+    "bad_deploy": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "db_connection_exhaustion": {
+      "n": 5,
+      "agent": 0.8,
+      "baseline": 0.0
+    },
+    "memory_leak": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "dependency_latency": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "certificate_expired": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "bad_config": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.2
+    }
+  },
+  "median_steps": 4,
+  "median_seconds": 39.3,
+  "median_tokens": 9170,
+  "avg_confidence_correct": 0.983,
+  "tool_usage": {
+    "search_logs": 34,
+    "list_services": 30,
+    "recent_changes": 29,
+    "get_metrics": 28,
+    "search_runbooks": 17,
+    "get_traces": 10
+  },
+  "failures": [
+    {
+      "id": "db_connection_exhaustion-2",
+      "said": "None/None",
+      "error": "LLM error 400: gemini/gemini-3.5-flash-lite returned 400: [{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Requests ending with a model turn are not supported.\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n]"
+    }
+  ]
+}

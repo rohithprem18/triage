@@ -1,0 +1,69 @@
+{
+  "benchmark": "30 simulated incidents: 6 fault types x 5 seeds",
+  "metric": "diagnosis correct = root-cause service AND fault type match the injected fault",
+  "n": 30,
+  "agent": {
+    "accuracy": 0.9333,
+    "service_accuracy": 0.9333
+  },
+  "baseline_alert_only": {
+    "accuracy": 0.0667,
+    "service_accuracy": 0.1333
+  },
+  "by_fault": {
+    "bad_deploy": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "db_connection_exhaustion": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "memory_leak": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "dependency_latency": {
+      "n": 5,
+      "agent": 0.6,
+      "baseline": 0.4
+    },
+    "certificate_expired": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    },
+    "bad_config": {
+      "n": 5,
+      "agent": 1.0,
+      "baseline": 0.0
+    }
+  },
+  "median_steps": 5,
+  "median_seconds": 16.0,
+  "median_tokens": 8602,
+  "avg_confidence_correct": 0.965,
+  "tool_usage": {
+    "search_logs": 38,
+    "get_metrics": 35,
+    "list_services": 30,
+    "recent_changes": 23,
+    "search_runbooks": 14,
+    "get_traces": 13
+  },
+  "failures": [
+    {
+      "id": "dependency_latency-1",
+      "said": "payments/dependency_latency",
+      "error": null
+    },
+    {
+      "id": "dependency_latency-3",
+      "said": "payments/dependency_latency",
+      "error": null
+    }
+  ]
+}
