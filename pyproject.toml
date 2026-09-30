@@ -1,0 +1,26 @@
+[project]
+name = "triage"
+version = "1.0.0"
+description = "Incident-response agent that investigates production alerts with tools, evaluated on simulated incidents"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["fastapi==0.115.6", "httpx==0.28.1"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# prompts, runbook-style text and scenario narratives read better unwrapped
+"triage/agent.py" = ["E501"]
+"triage/simulator.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
