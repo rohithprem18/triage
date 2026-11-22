@@ -127,7 +127,7 @@ def client():
 
 def test_incident_list_never_reveals_the_fault(client):
     cards = client.get("/api/incidents").json()
-    assert len(cards) == 6 and all(c["code"].startswith("INC-") for c in cards)
+    assert len(cards) == 7 and all(c["code"].startswith("INC-") for c in cards)  # one featured incident per fault type
     text = json.dumps(cards)
     for fault in ("certificate", "memory_leak", "bad_config", "db_connection"):
         assert fault not in text
@@ -145,5 +145,5 @@ def test_incident_detail_and_investigate_stream(client):
 
 
 def test_runbooks_and_health(client):
-    assert len(client.get("/api/runbooks").json()) == 7
+    assert len(client.get("/api/runbooks").json()) == 8
     assert client.get("/api/health").json()["environment"] == "simulated"

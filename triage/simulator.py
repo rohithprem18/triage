@@ -40,9 +40,10 @@ FAULTS = {
     "dependency_latency": "An external dependency became slow and calls time out",
     "certificate_expired": "A TLS certificate expired and handshakes fail",
     "bad_config": "A configuration change broke connectivity",
+    "disk_full": "The database host's disk filled up and writes fail",
 }
 
-METRICS = ["rps", "error_rate", "p95_ms", "cpu", "memory", "restarts", "connections"]
+METRICS = ["rps", "error_rate", "p95_ms", "cpu", "memory", "restarts", "connections", "disk_pct"]
 
 
 @dataclass
@@ -390,6 +391,58 @@ def build(fault: str, seed: int) -> Scenario:
         )
         title = "Checkout failures"
         notes.append("The failure starts on the minute with no deploy or config change at that time.")
+
+    elif fault == "disk_full":
+        root = "postgres"
+        ramp = _ramp(onset, width=8)
+        # only this fault reports disk usage, so the rng stream of the other faults is unchanged
+        m["postgres"]["disk_pct"] = [min(100.0, d + 58 * r) for d, r in zip(_series(rng, 42, 0.02), ramp, strict=True)]
+        err = [0.9 * (1.0 if i >= onset else 0.0) for i in range(WINDOW)]
+        m["catalog"]["error_rate"] = [min(1.0, a + b) for a, b in zip(m["catalog"]["error_rate"], err, strict=True)]
+        m["inventory"]["error_rate"] = [
+            min(1.0, a + b * 0.7) for a, b in zip(m["inventory"]["error_rate"], err, strict=True)
+        ]
+        m["postgres"]["rps"] = [p * (0.7 if i >= onset else 1) for i, p in enumerate(m["postgres"]["rps"])]
+        _propagate_errors(m, "gateway", err, 0.25)
+        logs.append(
+            LogTemplate(
+                "postgres",
+                "ERROR",
+                "SQLSTATE 53200: could not write block 41288 of relation base/16384/16400: No space left on device",
+                [26.0 if i >= onset else 0.0 for i in range(WINDOW)],
+            )
+        )
+        logs.append(
+            LogTemplate(
+                "postgres",
+                "WARN",
+                "checkpoint starting too late: disk almost full, write-ahead log on the same volume",
+                [0.8 if i >= onset else 0.0 for i in range(WINDOW)],
+            )
+        )
+        logs.append(
+            LogTemplate(
+                "catalog",
+                "ERROR",
+                "insert into products failed: postgres: could not write block: No space left on device",
+                [12.0 if i >= onset else 0.0 for i in range(WINDOW)],
+            )
+        )
+        traces = [
+            _trace(rng, "gateway", "catalog", "POST /api/products", 500, "catalog: postgres: No space left on device")
+            for _ in range(3)
+        ]
+        alert = {
+            "service": "catalog",
+            "metric": "error_rate",
+            "summary": "Catalog write errors",
+            "detail": f"catalog error rate {100 * m['catalog']['error_rate'][-1]:.0f}% (SLO 1%)",
+        }
+        remediation = (
+            "Extend the postgres volume (or archive WAL segments and VACUUM FULL); add a disk-usage alert at 80%."
+        )
+        title = "Catalog write errors"
+        notes.append("Reads still work; only writes fail. No deploy touched the database at onset.")
 
     else:  # bad_config
         root = "cart"

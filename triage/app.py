@@ -5,7 +5,7 @@ POST /api/incidents/new           a fresh random incident
 GET  /api/incidents/{code}        alert, service health, metrics and changes for the console
 POST /api/investigate             NDJSON stream of the agent's investigation
 GET  /api/runbooks                the runbooks the agent can search
-GET  /api/benchmark               accuracy on 30 simulated incidents
+GET  /api/benchmark               accuracy on 35 simulated incidents
 GET  /api/health
 """
 

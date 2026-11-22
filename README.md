@@ -27,7 +27,7 @@
 
 ## Results
 
-30 incidents (6 fault types × 5 seeds), scored strictly: a diagnosis counts only when **both** the root-cause service and the fault type match the injected fault. The baseline is the same model with the same prompt, given only the alert and the dependency graph, and no tools. Reproduce with [`bench/eval_incidents.py`](bench/eval_incidents.py); every run is in [`bench/results/`](bench/results).
+35 incidents (7 fault types × 5 seeds), scored strictly: a diagnosis counts only when **both** the root-cause service and the fault type match the injected fault. The baseline is the same model with the same prompt, given only the alert and the dependency graph, and no tools. Reproduce with [`bench/eval_incidents.py`](bench/eval_incidents.py); every run is in [`bench/results/`](bench/results).
 
 | | Correct diagnosis | Right service |
 |---|---|---|
@@ -51,7 +51,7 @@
 
 ## The environment
 
-Triage runs against a deterministic simulation of an e-commerce system, clearly labelled as such in the console: an edge gateway, checkout, payments, inventory, cart and catalog services, Postgres, Redis and an external payment provider. Each incident injects one of six faults and produces an hour of per-minute metrics, log templates with counts, sample traces and the change history.
+Triage runs against a deterministic simulation of an e-commerce system, clearly labelled as such in the console: an edge gateway, checkout, payments, inventory, cart and catalog services, Postgres, Redis and an external payment provider. Each incident injects one of seven faults and produces an hour of per-minute metrics, log templates with counts, sample traces and the change history.
 
 | Fault | What the evidence looks like |
 |---|---|
@@ -119,7 +119,7 @@ The API is one Vercel Python function and the console is static. `npx vercel lin
 ```
 triage/
 ├── triage/
-│   ├── simulator.py   # the simulated system: topology, six faults, metrics, logs, traces, changes
+│   ├── simulator.py   # the simulated system: topology, seven faults, metrics, logs, traces, changes
 │   ├── tools.py       # tool implementations + OpenAI function schemas, compact outputs
 │   ├── agent.py       # the investigation loop, text tool-call recovery, postmortem, alert-only baseline
 │   ├── runbooks.py    # BM25 over runbook sections
@@ -134,7 +134,7 @@ triage/
 ## Limitations
 
 - The environment is simulated. Real incidents are messier: several things break at once, telemetry has gaps, and runbooks are out of date. The simulator is a controlled testbed for the investigation loop, not a claim about production accuracy.
-- Six fault types and 30 incidents is a small benchmark; the interval around each number is wide.
+- Seven fault types and 35 incidents is a small benchmark; the interval around each number is wide.
 - Triage recommends mitigations; it never executes them.
 
 ## Contributing

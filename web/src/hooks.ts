@@ -47,4 +47,5 @@ export const FAULT_LABEL: Record<string, string> = {
   dependency_latency: "Slow external dependency",
   certificate_expired: "Expired certificate",
   bad_config: "Bad configuration",
+  disk_full: "Disk full",
 };
