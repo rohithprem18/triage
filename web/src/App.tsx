@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { api } from "./api";
 import { Navbar } from "./components/Navbar";
-import { useLoad, useRoute } from "./hooks";
+import { useLoad, useRoute, useTheme } from "./hooks";
 import { Benchmark } from "./views/Benchmark";
 import { Incidents } from "./views/Incidents";
 import { Runbooks } from "./views/Runbooks";
@@ -11,6 +11,7 @@ const TITLES = { incidents: "Incidents", system: "System", runbooks: "Runbooks",
 
 export default function App() {
   const { route, incident, go } = useRoute();
+  const [theme, toggleTheme] = useTheme();
   const [health, healthError] = useLoad((s) => api.health(s), []);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export default function App() {
 
   return (
     <>
-      <Navbar route={route} incident={incident} health={health} healthError={healthError} />
+      <Navbar route={route} incident={incident} health={health} healthError={healthError} theme={theme} onToggleTheme={toggleTheme} />
       <main key={route}>
         {route === "incidents" && <Incidents selected={incident} onSelect={(c) => go("incidents", c)} health={health} />}
         {route === "system" && <System incident={incident} onIncident={(c) => go("system", c)} />}

@@ -40,6 +40,41 @@ export function useLoad<T>(load: (signal: AbortSignal) => Promise<T>, deps: unkn
   return [data, error];
 }
 
+export type Theme = "light" | "dark";
+
+const THEME_KEY = "triage-theme";
+
+function storedTheme(): Theme | null {
+  const v = localStorage.getItem(THEME_KEY);
+  return v === "light" || v === "dark" ? v : null;
+}
+
+function systemTheme(): Theme {
+  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
+/**
+ * The console theme: the stored choice wins, otherwise the system preference.
+ * Applies it as data-theme on <html> (the palettes in styles.css key off it) and
+ * remembers every toggle in localStorage.
+ */
+export function useTheme(): [Theme, () => void] {
+  const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: light)");
+    const onChange = () => {
+      if (!storedTheme()) setTheme(systemTheme());
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))];
+}
+
 export const FAULT_LABEL: Record<string, string> = {
   bad_deploy: "Bad deploy",
   db_connection_exhaustion: "DB connection exhaustion",
